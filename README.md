@@ -4,19 +4,20 @@ In this project, your goal is to write a software pipeline to identify the lane 
 
 ## Table of Content
 
-- [Advanced Lane Finding Project]()
-- [Camera Calibration]()
-- [Pipeline (single images)]()
-  - [An example of a distortion-corrected image]()
-- [Create a thresholded binary image and apply canny transform]()
-- [Perspective Transform and Create Images for the Left and Right Lines]()
-- [Hough Transform]()
-- [Add the Green Zone and Retransform it to the Original Perspective]()
-- [Radius of curvature of the lane and the position of the vehicle with respect to center]()
-- [Tuning the Parameters]()
-- [Pipeline (video)]()
-- [Discussion]()
-- [License]()
+- [Advanced Lane Finding Project](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#advanced-lane-finding-project)
+- [Camera Calibration](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#camera-calibration)
+- [Pipeline (single images)](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#pipeline-single-images)
+  - [An example of a distortion-corrected image](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#an-example-of-a-distortion-corrected-image)
+- [Create a thresholded binary image and apply canny transform](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#create-a-thresholded-binary-image-and-apply-canny-transform)
+- [Perspective Transform and Create Images for the Left and Right Lines](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#perspective-transform-and-create-images-for-the-left-and-right-lines)
+- [Hough Transform](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#hough-transform)
+- [Find the Best Line with Polynomial Interpolation](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#find-the-best-line-with-polynomial-interpolation)
+- [Add the Green Zone and Retransform it to the Original Perspective](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#add-the-green-zone-and-retransform-it-to-the-original-perspective)
+- [Radius of curvature of the lane and the position of the vehicle with respect to center](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#radius-of-curvature-of-the-lane-and-the-position-of-the-vehicle-with-respect-to-center)
+- [Tuning the Parameters](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#tuning-the-parameters)
+- [Pipeline (video)](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#pipeline-video)
+- [Discussion](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#discussion)
+- [License](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#license)
 
 
 ---
@@ -33,6 +34,10 @@ The goals / steps of this project are the following:
 * Determine the curvature of the lane and vehicle position with respect to center.
 * Warp the detected lane boundaries back onto the original image.
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
+
+> **Files**
+>
+> You can find the code inside [`project.ipynb`](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/project.ipynb) file. Resource images in [`./res`](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/tree/master/res) folder.
 
 [//]: # "Image References"
 
@@ -116,7 +121,7 @@ The steps are as following:
 
   |   Original Image    | Generated Mask for Yellow and White colors |
   | :-----------------: | :--------------------------------------: |
-  | ![alt text][image6] |           ![alt text][image5]-           |
+  | ![alt text][image6] |           ![alt text][image5]            |
 
 - Apply the mask to the original image. Then, make it blur to reduce the noise using `cv2.GaussianBlur()`. Apply the **canny transform** to the blurred image.
 
