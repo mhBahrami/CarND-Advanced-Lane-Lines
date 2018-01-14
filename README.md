@@ -72,7 +72,7 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 ![alt text][image1]
 
-You can see other examples here, here, hand here.
+You can see other examples here: [[1]](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/res/undistort_output_calibration01.jpg), [[2]](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/res/undistort_output_calibration02.jpg), [[3]](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/res/undistort_output_calibration03.jpg), and [[4]](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/res/undistort_output_calibration04.jpg).
 
 > `cal_undistort(img, objpoints, imgpoints)` in 6th code cell in `project.ipynb` is responsible to create undistorted image.
 
