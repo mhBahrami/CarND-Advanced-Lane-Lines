@@ -260,7 +260,7 @@ lw = 2
 
 ### Pipeline (video)
 
-Here's a [link to my video result](./project_video.mp4) and you can watch it online [here](https://youtu.be/EqNMOwQrt-w).
+Here's a [link to my video result](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/tree/master/output) and you can watch it online [here](https://youtu.be/EqNMOwQrt-w).
 
 ### Discussion
 
