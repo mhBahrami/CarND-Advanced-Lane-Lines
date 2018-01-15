@@ -43,28 +43,36 @@ The goals / steps of this project are the following:
 
 [image1]: ./res/undistort_output_calibration05.jpg "Original image (left) and its undistorted version (right)"
 [image2]: ./res/undistort_output_test1.jpg "Road Transformed"
-[image3]: ./res/test2_mask_y.jpg "Generated Mask for Yellow Color"
-[image4]: ./res/test2_mask_w.jpg "Generated Mask for White Color"
-[image5]: ./res/test2_mask_wy.jpg "Generated Mask for Yellow & White Colors"
+[image3]: ./res/test2_sxbinary.jpg "Sobel x Binary"
+[image4]: ./res/test2_s_binary.jpg "S Channel Binary"
+[image5]: ./res/test2_color_binary.jpg "Color Binary- Combined Version"
 [image6]: ./res/test2_source.jpg "Test Image"
 [image7]: ./res/test2_region_of_interest.jpg "The Image after Applying the Mask"
 [image8]: ./res/test2_region_of_interest_blur.jpg "Blur to Reduce Noise"
 [image9]: ./res/test2_region_of_interest_canny.jpg "Canny Edge Detection"
-[image10]: ./res/test2_img_trans_org2rec.jpg "Apply the Perspective Transform"
-[image11]: ./res/test2_img_left.jpg "The Left Pipeline Image"
-[image12]: ./res/test2_img_right.jpg "The Right Pipeline Image"
+[image10]: ./res/test2_perspective_transform.png "Apply the Perspective Transform"
+[image11]: ./res/test2_out_img_1_1.jpg
+[image12]: ./res/test2_out_img_1_2.jpg
 [image13]: ./res/test2_img_left_plus_hough_lines.jpg "The Starting and Ending Points of Hough Transform Lines for the Left Side"
 [image14]: ./res/test2_img_right_plus_hough_lines.jpg "The Starting and Ending Points of Hough Transform Lines for the Right Side"
 [image15]: ./res/test2_calculated_curved_pipelines.jpg "The Calculated Pipelines"
 [image16]: ./res/test2_curved_pipelines_with_green_zone.jpg "The Calculated Pipelines with Green Zone"
 [image17]: ./res/test2_img_trans_rec2org.jpg "Retransform to the Original Perspective"
-[image18]: ./res/test2_final.jpg "Add the Green Zone to the Undistorted Frame"
+[image18]: ./res/test2_final.jpg "Final Result"
+
+
+
+
+
+[image19]: ./res/off_1.png "Issue with Tuning Parameters by Hand!"
+[image20]: ./res/tuning_tool.png "Tuning Tool"
+[image21]: ./res/tuned_frame.png "Resolving Issue after Using the Tuning Tool"
 
 ---
 
 ### Camera Calibration
 
-> The code for this step is contained in the first code cell of the IPython notebook located in the code cells number 2 to 4 in `project.ipynb`.  
+> The code for this step is contained in the first code cell of the IPython notebook located in the code cells number 2 to 5 in `project.ipynb`.  
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
@@ -107,40 +115,50 @@ Steps to create undistorted image:
 
 ### Create a thresholded binary image and apply canny transform
 
-I used a combination of color and gradient thresholds to generate a binary image. Then I used the canny edge detection method to create an image for finding the lines.
+I used a combination of color and gradient thresholds to generate a binary image. The steps are as following:
 
-The steps are as following:
+- Applying Sobel (x gradient) and S channel color selection after converting the RGB image to HLS.
 
-- Create a mask to select white and yellow color regions in the image using `get_white_yellow_mask()` function. I created masks for white and yellow colors using `cv2.inRange()` separately and then I combined them using `cv2.bitwise_and()`. you can see the result below.
+  > You can see the code in the *13th code cell* of `project.ipynb` (*lines 51 to 98*).
 
-  > You can see the code in the*12th code cell* of `project.ipynb` (*lines 65 to 112*).
+  ```python
+  # Convert to HLS color space and separate the V channel
+  hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
+  l_channel = hls[:,:,1]
+  s_channel = hls[:,:,2]
+  # Sobel x
+  sobelx = cv2.Sobel(l_channel, cv2.CV_64F, 1, 0) # Take the derivative in x
+  abs_sobelx = np.absolute(sobelx) # Absolute x derivative to accentuate lines away from horizontal
+  scaled_sobel = np.uint8(255*abs_sobelx/np.max(abs_sobelx))
 
-  | Generated Mask for Yellow Color | Generated Mask for White Color |
-  | :-----------------------------: | :----------------------------: |
-  |       ![alt text][image3]       |      ![alt text][image4]       |
+  # Threshold x gradient
+  sxbinary = np.zeros_like(scaled_sobel)
+  sxbinary[(scaled_sobel >= sx_thresh[0]) & (scaled_sobel <= sx_thresh[1])] = 1
 
-  |   Original Image    | Generated Mask for Yellow and White colors |
-  | :-----------------: | :--------------------------------------: |
-  | ![alt text][image6] |           ![alt text][image5]            |
+  # Threshold color channel
+  s_binary = np.zeros_like(s_channel)
+  s_binary[(s_channel >= s_thresh[0]) & (s_channel <= s_thresh[1])] = 1
+  ```
 
-- Apply the mask to the original image. Then, make it blur to reduce the noise using `cv2.GaussianBlur()`. Apply the **canny transform** to the blurred image.
-
-  > You can see the code in the*12th code cell* of `project.ipynb` (*lines 155 to 179*).
-
-  |   Apply the Mask    |   Blur the Image    |
+  |   Sobel x Binary    |  S Channel Binary   |
   | :-----------------: | :-----------------: |
-  | ![alt text][image7] | ![alt text][image8] |
+  | ![alt text][image3] | ![alt text][image4] |
 
-  | Apply the Canny Transform |
-  | :-----------------------: |
-  |    ![alt text][image9]    |
+- Then combine them:
 
+  ```python
+  color_binary[(s_binary == 1) | (sxbinary == 1)] = 1
+  ```
+
+  |   Original Image    |  Combined Version   |
+  | :-----------------: | :-----------------: |
+  | ![alt text][image6] | ![alt text][image5] |
 
 ### Perspective Transform and Create Images for the Left and Right Lines 
 
 I used `cv2.getPerspectiveTransform()` and `cv2.warpPerspective()` to create an image that includes the pipelines without perspective. Before finding the left and right curved pipelines, I separated the left and right lines using `separate_to_left_right()` function.
 
-> You can see the code in the*12th code cell* of `project.ipynb` (*lines 182 to 248*).
+> You can see the code in the *13th code cell* of `project.ipynb` (*lines 1 to 44*).
 
 The result for the sample image is as follows:
 
@@ -148,11 +166,7 @@ The result for the sample image is as follows:
 | :-------------------------: |
 |    ![alt text][image10]     |
 
-| The Left Pipeline Image | The Right Pipeline Image |
-| :---------------------: | :----------------------: |
-|  ![alt text][image11]   |   ![alt text][image12]   |
-
-### Hough Transform
+### Sliding Window
 
 Next step is applying _Hough Transform_ by using `find_hough_lines()` function to the both left and right side images. The results for each side is a set of lines and each line contains a couple of points that indicates the starting and ending points of it.
 
@@ -164,29 +178,132 @@ The result is as following:
 | :--------------------------------------: | :--------------------------------------: |
 |           ![alt text][image13]           |           ![alt text][image14]           |
 
-### Find the Best Line with Polynomial Interpolation
+### Locate the Lane Lines and Fit a Polynomial
 
-`scikit-learn` has some pakcages for Polynomial Interpolation (see an example [here](http://scikit-learn.org/stable/auto_examples/linear_model/plot_polynomial_interpolation.html)). In fact, I used linear regression with polynomial features to approximate a nonlinear function that fits the points which were found from the previous step. I used the following packages:
+Steps are as following:
 
-```python
-from sklearn.linear_model import Ridge
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.pipeline import make_pipeline
-```
+- Take a histogram of the bottom half of the image
 
-The function that is responsible to fit the best line is `find_pipeline()`. The polynomial with a degree equal to 2 gives the best results. If you increase or decrease the degree of polynomial, the underfitting and overfitting problems occur. For more information see [here](http://scikit-learn.org/stable/auto_examples/model_selection/plot_underfitting_overfitting.html#sphx-glr-auto-examples-model-selection-plot-underfitting-overfitting-py). Finally, the calculated pipeline formula would be used to draw pipelines using `draw_pred_lines()` function (image below).
+  ```python
+  histogram = np.sum(binary_warped[binary_warped.shape[0]/2:,:], axis=0)
+  ```
 
-> You can see the code in the*12th code cell* of `project.ipynb` *lines 281 to 423*.
+- Create an output image to draw on and  visualize the result.
 
-| The Calculated Pipelines |
-| :----------------------: |
-|   ![alt text][image15]   |
+  ```python
+  out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
+  ```
+
+
+- Find the peak of the left and right halves of the histogram. These will be the starting point for the left and right lines.
+
+  ```python
+  midpoint = np.int(histogram.shape[0]/2)
+  leftx_base = np.argmax(histogram[:midpoint])
+  rightx_base = np.argmax(histogram[midpoint:]) + midpoint
+  ```
+
+- Choose the number of sliding windows and set height of windows
+
+  ```python
+  nwindows = 9
+  window_height = np.int(binary_warped.shape[0]/nwindows)
+  ```
+
+- Identify the x and y positions of all nonzero pixels in the image
+
+  ```python
+  nonzero = binary_warped.nonzero()
+  nonzeroy = np.array(nonzero[0])
+  nonzerox = np.array(nonzero[1])
+  ```
+
+   Current positions to be updated for each window
+
+  ```python
+  leftx_current = leftx_base
+  rightx_current = rightx_base
+  ```
+
+- Set the width of the windows +/- margin
+
+  ```python
+  margin = 100
+  ```
+
+- Set minimum number of pixels found to re-center window
+
+  ```python
+  minpix = 50
+  ```
+
+- Step through the windows one by one 
+
+  ```python
+  for window in range(nwindows):
+      # Identify window boundaries in x and y (and right and left)
+      win_y_low = binary_warped.shape[0] - (window+1)*window_height
+      win_y_high = binary_warped.shape[0] - window*window_height
+      win_xleft_low = leftx_current - margin
+      win_xleft_high = leftx_current + margin
+      win_xright_low = rightx_current - margin
+      win_xright_high = rightx_current + margin
+      # Draw the windows on the visualization image
+      cv2.rectangle(out_img,(win_xleft_low,win_y_low),(win_xleft_high,win_y_high),
+      (0,255,0), 2) 
+      cv2.rectangle(out_img,(win_xright_low,win_y_low),(win_xright_high,win_y_high),
+      (0,255,0), 2) 
+      # Identify the nonzero pixels in x and y within the window
+      good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & 
+      (nonzerox >= win_xleft_low) &  (nonzerox < win_xleft_high)).nonzero()[0]
+      good_right_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & 
+      (nonzerox >= win_xright_low) &  (nonzerox < win_xright_high)).nonzero()[0]
+      # Append these indices to the lists
+      left_lane_inds.append(good_left_inds)
+      right_lane_inds.append(good_right_inds)
+      # If you found > minpix pixels, recenter next window on their mean position
+      if len(good_left_inds) > minpix:
+          leftx_current = np.int(np.mean(nonzerox[good_left_inds]))
+      if len(good_right_inds) > minpix:        
+          rightx_current = np.int(np.mean(nonzerox[good_right_inds]))
+  ```
+
+- Concatenate the arrays of indices
+
+  ```python
+  left_lane_inds = np.concatenate(left_lane_inds)
+  right_lane_inds = np.concatenate(right_lane_inds)
+  ```
+
+- Extract left and right line pixel positions
+
+  ```python
+  leftx = nonzerox[left_lane_inds]
+  lefty = nonzeroy[left_lane_inds] 
+  rightx = nonzerox[right_lane_inds]
+  righty = nonzeroy[right_lane_inds] 
+  ```
+
+- Fit a second order polynomial to each
+
+  ```python
+  left_fit = np.polyfit(lefty, leftx, 2)
+  right_fit = np.polyfit(righty, rightx, 2)
+  ```
+
+> You can see the code in the *13th code cell* of `project.ipynb` *lines 101 to 354*.
+
+The results are as following:
+
+| ![alt text][image11] |
+| :------------------: |
+| ![alt text][image12] |
 
 ### Add the Green Zone and Retransform it to the Original Perspective
 
 The safe driving area for a car is the area between the pipelines that I call it "Green Zone." Let's fill the area between red pipelines with the green color using `add_green_zone()` function. For implementing this function I used `cv2.fillPoly()` from OpenCV (figure below). Then retransform it to the original perspective using `transform_back_to_origin()`. 
 
->  You can see the code in the*12th code cell* of `project.ipynb` *lines 214 to 225 and 426 to 440*.
+>  You can see the code in the *13th code cell* of `project.ipynb` *lines 398 to 38 and 33 to 44*.
 
 The results are as following:
 
@@ -202,69 +319,86 @@ Now its time to add it to the undistorted frame (below image).
 
 ### Radius of curvature of the lane and the position of the vehicle with respect to center
 
-I calculated the radius of curvature based on this [tutorial](https://www.intmath.com/applications-differentiation/8-radius-curvature.php). The **radius of curvature** of the curve at a particular point is defined as the radius of the approximating circle. This radius changes as we move along the curve. $ 
+I calculated the radius of curvature based on this [tutorial](https://www.intmath.com/applications-differentiation/8-radius-curvature.php). The **radius of curvature** of the curve at a particular point is defined as the radius of the approximating circle. This radius changes as we move along the curve. 
 
-> You can see the code in the*12th code cell* of `project.ipynb` *lines 443 to 463*.
+> You can see the code in the*12th code cell* of `project.ipynb` *lines 357 to 395*.
 
 I located the lane line pixels, used their x and y pixel positions to fit a second order polynomial curve:
 
-$f(x) = A y^2 + By +C$
+$f(x) = A y^2 + By +C $  where $y$ in $[a, b]$
 
-After finding $A$, $B$, and $C$ I calculated the radius of curvature with the following equation:
+**y** is from **a** to **b**. After finding $A$, $B$, and $C$ I calculated the radius of curvature with the following equation:
 
 $R_{curve} = \frac{[1+(2Ay+B)^2]^{3/2}}{|2A|}$
 
 Then I used next equation to calculate position of the center:
 
-$y_{center} = - \frac{R_{curve}}{\sqrt{1+m^2}}\times\frac{A}{|A|}+y_{vehicle} $
+$y_{center} = (cols - f_{left}(b) - f_{right}(b))/2 $
 
-where $m$ is the slope of the **normal**. You can find more info [here](https://www.intmath.com/applications-differentiation/8-radius-curvature.php) in *"Example 1."*
+if the result value is **negative** it means the vehicle is in the **left** of center and it the result is a **positive** value it means the vehicle is in the **right** of center.
 
-### Tuning the Parameters
+### `find_pipelines_and_green_zone()`
 
-I put the parameters for different parts of this code in one place to tune them conveniently. The final result for these parameters are as following:
+This function is doing everything for each frame:
+
+> The *14th code cell* in `project.ipynb`.
 
 ```python
-# Color in range:project_video 
-y_lower = [10, 0, 120]
-y_upper = [40, 255, 255]
-w_lower = [16, 182, 0]
-w_upper = [255, 255, 255]
+def find_pipelines_and_green_zone(img, objpoints, imgpoints, prefix = None, _plot = False):
+    global left_line, right_line
+    use_sliding = left_line==None or right_line==None
+    if(left_line==None): left_line = Line()
+    if(right_line==None): right_line = Line()
+    # Create an undistorted image
+    img = cal_undistort(img, objpoints, imgpoints)
+    rows,cols,ch = img.shape
+    binary_warped = get_binary_warped(img, s_thresh=(170, 255), sx_thresh=(20, 100), _plot=_plot, prefix=prefix)
+    if new_mask is not None:
+        binary_warped = cv2.bitwise_and(binary_warped, new_mask)
+    binary_warped_transf = transform_to_rectangle(binary_warped, rows, cols, prefix=prefix, _plot=_plot)
+    left_fit, right_fit = find_pipeline(binary_warped_transf, use_sliding=True, _draw_window=_plot, _plot=_plot, prefix=prefix)
+    
+    if(left_fit is not None):
+        left_line.current_fit = left_fit
+    if(right_fit is not None):
+        right_line.current_fit = right_fit
+    
+    if(left_line.current_fit is not None and right_line.current_fit is not None):
+        left_fit, right_fit = left_line.current_fit, right_line.current_fit
+        left_roc, right_roc, _x_center, _vehicle_pos = radius_of_curvature(rows, cols, left_fit, right_fit)   
+        
+        img_lines = draw_pred_lines(rows, cols, left_fit, right_fit, line_width=40, prefix=prefix, _plot =_plot)
+        img_green_zone = add_green_zone(img_lines, left_fit, right_fit, prefix=prefix, _plot=_plot)
+        img_trans_back = transform_back_to_origin(img_green_zone, rows, cols, prefix=prefix, _plot=_plot)
+        img_wght = weighted_img(img, img_trans_back)
+        final = put_text(img_wght, left_roc, right_roc, _x_center, _vehicle_pos)
+    else:
+        final = img
 
-# Transform:project_video
-coef_w_top = 0.15
-coef_w_dwn = 1.00
-offset_v_top = 0.63
-offset_v_dwn = 0.05
-
-# Blur
-kernel_size = 9
-
-# Canny
-canny_low_threshold = 0
-canny_high_threshold = 255
-
-# Make a blank the same size as our image to draw on
-rho = 1                 # distance resolution in pixels of the Hough grid
-theta = np.pi/180 * 0.5 # angular resolution in radians of the Hough grid
-threshold = 10          # minimum number of votes (intersections in Hough grid cell)
-min_line_len = 15       # minimum number of pixels making up a line
-max_line_gap = 10       # maximum gap in pixels between connectable line segments
-
-# Interpolation
-degree = 2
-
-# plot 
-lw = 2
+    return final
 ```
 
 ### Pipeline (video)
 
-Here's a [link to my video result](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/tree/master/output) and you can watch it online [here](https://youtu.be/EqNMOwQrt-w).
+Here's a [link to my video result](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/tree/master/output) and you can watch it online [here](https://youtu.be/v2jqEr4Ushk).
 
 ### Discussion
 
 Sometimes the algorithm is unable to find curved lines, like when the brightness of the road is high. In this case I used the buffered data for the most recent frame which has the valid calculated data. 
+
+Moreover, It was very difficult to tune above parameters. At first I was finding parameters by changing it inside the code. And I spend one day to change them. However, still some frames had problem, like image below.
+
+![alt text][image19]
+
+Finally, I created a tool for tuning with slide bars to change parameters and see the result at the same time. [`tune()`]() in [`opencv_helper.py`]() is the function which helps to tune parameters for color selection. I created 14 Trackbar with a value between 0 and 255(below image). There are **2 color selection**, one for yellow and the other for white. Each needs **2 ranges**, a lower range and an upper range. And each range has **3 values**, [H, L, S]. Also **2** Trackbar for canny transform. In total 14 Trackbars (2\*2\*3+2).
+
+![alt text][image20]
+
+And you can see the result after tuning with new method the issue has been resolved.
+
+![alt text][image21]
+
+But it doesn't work properly. So, I used the second method which is **Histogram and Sliding Window** and I described it above. This method produces more accurate results.
 
 ### License
 
