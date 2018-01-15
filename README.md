@@ -11,7 +11,7 @@ In this project, your goal is to write a software pipeline to identify the lane 
 - [Create a thresholded binary image](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#create-a-thresholded-binary-image)
 - [Perspective Transform ](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#perspective-transform)
 - [Sliding Window](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#sliding-window)
-- [Locate the Lane Lines and Fit a Polynomial](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#locate-the-lane-lines-and-fit-a-polynomial)
+  - [Locate the Lane Lines and Fit a Polynomial](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#locate-the-lane-lines-and-fit-a-polynomial)
 - [Add the Green Zone and Retransform it to the Original Perspective](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#add-the-green-zone-and-retransform-it-to-the-original-perspective)
 - [Radius of curvature of the lane and the position of the vehicle with respect to center](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#radius-of-curvature-of-the-lane-and-the-position-of-the-vehicle-with-respect-to-center)
 - [`find_pipelines_and_green_zone()`](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#find_pipelines_and_green_zone)
@@ -375,7 +375,7 @@ Moreover, It was very difficult to tune above parameters. At first I was finding
 
 ![alt text][image19]
 
-Finally, I created a tool for tuning with slide bars to change parameters and see the result at the same time. [`tune()`]() in [`opencv_helper.py`]() is the function which helps to tune parameters for color selection. I created 14 Trackbar with a value between 0 and 255(below image). There are **2 color selection**, one for yellow and the other for white. Each needs **2 ranges**, a lower range and an upper range. And each range has **3 values**, [H, L, S]. Also **2** Trackbar for canny transform. In total 14 Trackbars (2\*2\*3+2).
+Finally, I created a tool for tuning with slide bars to change parameters and see the result at the same time. [`tune()`](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/opencv_helper.py#L72) in [`opencv_helper.py`](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/opencv_helper.py) is the function which helps to tune parameters for color selection. I created 14 Trackbar with a value between 0 and 255(below image). There are **2 color selection**, one for yellow and the other for white. Each needs **2 ranges**, a lower range and an upper range. And each range has **3 values**, [H, L, S]. Also **2** Trackbar for canny transform. In total 14 Trackbars (2\*2\*3+2).
 
 ![alt text][image20]
 
