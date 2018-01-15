@@ -8,13 +8,13 @@ In this project, your goal is to write a software pipeline to identify the lane 
 - [Camera Calibration](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#camera-calibration)
 - [Pipeline (single images)](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#pipeline-single-images)
   - [An example of a distortion-corrected image](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#an-example-of-a-distortion-corrected-image)
-- [Create a thresholded binary image and apply canny transform](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#create-a-thresholded-binary-image-and-apply-canny-transform)
-- [Perspective Transform and Create Images for the Left and Right Lines](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#perspective-transform-and-create-images-for-the-left-and-right-lines)
-- [Hough Transform](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#hough-transform)
-- [Find the Best Line with Polynomial Interpolation](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#find-the-best-line-with-polynomial-interpolation)
+- [Create a thresholded binary image](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#create-a-thresholded-binary-image)
+- [Perspective Transform ](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#perspective-transform)
+- [Sliding Window](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#sliding-window)
+- [Locate the Lane Lines and Fit a Polynomial](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#locate-the-lane-lines-and-fit-a-polynomial)
 - [Add the Green Zone and Retransform it to the Original Perspective](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#add-the-green-zone-and-retransform-it-to-the-original-perspective)
 - [Radius of curvature of the lane and the position of the vehicle with respect to center](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#radius-of-curvature-of-the-lane-and-the-position-of-the-vehicle-with-respect-to-center)
-- [Tuning the Parameters](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#tuning-the-parameters)
+- [`find_pipelines_and_green_zone()`](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#find_pipelines_and_green_zone)
 - [Pipeline (video)](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#pipeline-video)
 - [Discussion](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#discussion)
 - [License](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#license)
@@ -59,11 +59,6 @@ The goals / steps of this project are the following:
 [image16]: ./res/test2_curved_pipelines_with_green_zone.jpg "The Calculated Pipelines with Green Zone"
 [image17]: ./res/test2_img_trans_rec2org.jpg "Retransform to the Original Perspective"
 [image18]: ./res/test2_final.jpg "Final Result"
-
-
-
-
-
 [image19]: ./res/off_1.png "Issue with Tuning Parameters by Hand!"
 [image20]: ./res/tuning_tool.png "Tuning Tool"
 [image21]: ./res/tuned_frame.png "Resolving Issue after Using the Tuning Tool"
@@ -82,7 +77,7 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 You can see other examples here: [[1]](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/res/undistort_output_calibration01.jpg), [[2]](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/res/undistort_output_calibration02.jpg), [[3]](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/res/undistort_output_calibration03.jpg), and [[4]](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/blob/master/res/undistort_output_calibration04.jpg).
 
-> `cal_undistort(img, objpoints, imgpoints)` in 6th code cell in `project.ipynb` is responsible to create undistorted image.
+> `cal_undistort(img, objpoints, imgpoints)` in *7th code cell* in `project.ipynb` is responsible to create undistorted image.
 
 ### Pipeline (single images)
 
@@ -113,7 +108,7 @@ Steps to create undistorted image:
   undist = cv2.undistort(img, mtx, dist, None, mtx)
   ```
 
-### Create a thresholded binary image and apply canny transform
+### Create a thresholded binary image
 
 I used a combination of color and gradient thresholds to generate a binary image. The steps are as following:
 
@@ -154,9 +149,9 @@ I used a combination of color and gradient thresholds to generate a binary image
   | :-----------------: | :-----------------: |
   | ![alt text][image6] | ![alt text][image5] |
 
-### Perspective Transform and Create Images for the Left and Right Lines 
+### Perspective Transform 
 
-I used `cv2.getPerspectiveTransform()` and `cv2.warpPerspective()` to create an image that includes the pipelines without perspective. Before finding the left and right curved pipelines, I separated the left and right lines using `separate_to_left_right()` function.
+I used `cv2.getPerspectiveTransform()` and `cv2.warpPerspective()` to create an image that includes the pipelines without perspective.
 
 > You can see the code in the *13th code cell* of `project.ipynb` (*lines 1 to 44*).
 
@@ -168,17 +163,7 @@ The result for the sample image is as follows:
 
 ### Sliding Window
 
-Next step is applying _Hough Transform_ by using `find_hough_lines()` function to the both left and right side images. The results for each side is a set of lines and each line contains a couple of points that indicates the starting and ending points of it.
-
-> You can see the code in the*12th code cell* of `project.ipynb` (*lines 251 to 278*).
-
-The result is as following:
-
-| The Starting and Ending Points of Hough Transform Lines for the Left Side | The Starting and Ending Points of Hough Transform Lines for the Right Side |
-| :--------------------------------------: | :--------------------------------------: |
-|           ![alt text][image13]           |           ![alt text][image14]           |
-
-### Locate the Lane Lines and Fit a Polynomial
+#### Locate the Lane Lines and Fit a Polynomial
 
 Steps are as following:
 
