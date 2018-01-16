@@ -17,7 +17,7 @@ In this project, your goal is to write a software pipeline to identify the lane 
 - [`find_pipelines_and_green_zone()`](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#find_pipelines_and_green_zone)
 - [Pipeline (video)](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#pipeline-video)
 - [Discussion](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#discussion)
-  - [Hypothetical Pipeline Failure Cases]()
+  - [Hypothetical Pipeline Failure Cases](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#hypothetical-pipeline-failure-cases)
 - [License](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#license)
 
 
