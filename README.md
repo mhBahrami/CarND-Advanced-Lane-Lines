@@ -17,6 +17,7 @@ In this project, your goal is to write a software pipeline to identify the lane 
 - [`find_pipelines_and_green_zone()`](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#find_pipelines_and_green_zone)
 - [Pipeline (video)](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#pipeline-video)
 - [Discussion](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#discussion)
+  - [Hypothetical Pipeline Failure Cases]()
 - [License](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines#license)
 
 
@@ -384,6 +385,16 @@ And you can see the result after tuning with new method the issue has been resol
 ![alt text][image21]
 
 But it doesn't work properly. So, I used the second method which is **Histogram and Sliding Window** and I described it above. This method produces more accurate results.
+
+#### Hypothetical Pipeline Failure Cases
+
+Pavement fixes and/or combined with other surfaces that create vertical lines near existing road lines.
+
+It would also fail if there was a road crossing or a need to cross lanes or to exit the freeway.
+
+Rain and snow would also have an impact and I’m not sure about night time.
+
+Tail gating a car or a car on a tighter curve would potentially interrupt the visible camera and hence line detection.
 
 ### License
 
