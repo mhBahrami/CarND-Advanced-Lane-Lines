@@ -307,7 +307,7 @@ Now its time to add it to the undistorted frame (below image).
 
 I calculated the radius of curvature based on this [tutorial](https://www.intmath.com/applications-differentiation/8-radius-curvature.php). The **radius of curvature** of the curve at a particular point is defined as the radius of the approximating circle. This radius changes as we move along the curve. 
 
-> You can see the code in the*12th code cell* of `project.ipynb` *lines 357 to 395*.
+> You can see the code in the*12th code cell* of `project.ipynb` *lines 357 to 399*.
 
 I located the lane line pixels, used their x and y pixel positions to fit a second order polynomial curve:
 
@@ -323,6 +323,53 @@ $y_{center} = (cols - f_{left}(b) - f_{right}(b))/2 $
 
 if the result value is **negative** it means the vehicle is in the **left** of center and it the result is a **positive** value it means the vehicle is in the **right** of center.
 
+You can see the code here:
+
+```python
+def radius_of_curvature(rows, cols, left_fit, right_fit):
+  """
+     o----o    -                       o--------------o -
+    /      \   |    ------------->     |              | |
+   /        \  | b                     |              | |d
+  o----------o -                       o--------------o - 
+  |----a-----|                         |-------c------|
+
+  a(px)=>3.7m                          c(px)=>3.7m
+  ym_per_pix=3.7/a                     new_ym_per_pix = 3.7/c
+  xm_per_pix=30/b                      new_xm_per_pix = 30/d
+
+  + In Pixel:
+  x = f(y) = A*y^2 + B*y + C
+  R = [1+(2*A*y+B)^2]^1.5/(2*|A|)  
+  + In Meter:
+  X = f(Y) = (xm/ym^2)*A*Y^2 + (xm/ym)*B*Y + xm*C
+  R = [1 + (2*(xm/ym^2)*A*y+(xm/ym)*B)^2]^1.5/(2*xm*|A|/ym^2)
+  """
+  # Define conversions in x and y from pixels space to meters
+  c, d = cols, rows
+  ym_per_pix = 30/d # meters per pixel in y dimension
+  xm_per_pix = 3.7/c # meters per pixel in x dimension
+
+  # Generate some fake data to represent lane-line pixels
+  ploty = np.linspace(0, rows-1, rows)# to cover same y-range as image
+  y_eval = max(ploty)
+
+  # Calculate the new radii of curvature
+  Al, Ar = left_fit[0], right_fit[0]
+  Bl, Br = left_fit[1], right_fit[1]
+  Cl, Cr = left_fit[2], right_fit[2]
+  ym, xm = ym_per_pix, xm_per_pix
+  left_curverad = (1 + (2*(xm/ym**2)*Al*y_eval + (xm/ym)*Bl)**2)**1.5 / np.absolute(2*xm*Al/ym**2)
+  right_curverad = (1 + (2*(xm/ym**2)*Ar*y_eval + (xm/ym)*Br)**2)**1.5 / np.absolute(2*xm*Ar/ym**2)
+
+  # Calculate the vehicle offset from center 
+  left_line_pos = Al*y_eval**2 + Bl*y_eval + Cl
+  right_line_pos = Ar*y_eval**2 + Br*y_eval + Cr
+  pos_to_center = (cols - (left_line_pos+right_line_pos))/2 * xm_per_pix
+  _vehicle_pos = 'left' if pos_to_center < 0 else 'right'
+
+  return left_curverad, right_curverad, abs(pos_to_center), _vehicle_pos
+```
 ### `find_pipelines_and_green_zone()`
 
 This function is doing everything for each frame:
@@ -366,7 +413,7 @@ def find_pipelines_and_green_zone(img, objpoints, imgpoints, prefix = None, _plo
 
 ### Pipeline (video)
 
-Here's a [link to my video result](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/tree/master/output) and you can watch it online [here](https://youtu.be/3uexYkXgwkA).
+Here's a [link to my video result](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/tree/master/output) and you can watch it online [here](https://youtu.be/GEifnxlJ8gE).
 
 ### Discussion
 
