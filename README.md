@@ -366,7 +366,7 @@ def find_pipelines_and_green_zone(img, objpoints, imgpoints, prefix = None, _plo
 
 ### Pipeline (video)
 
-Here's a [link to my video result](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/tree/master/output) and you can watch it online [here](https://youtu.be/v2jqEr4Ushk).
+Here's a [link to my video result](https://github.com/mhBahrami/CarND-Advanced-Lane-Lines/tree/master/output) and you can watch it online [here](https://youtu.be/3uexYkXgwkA).
 
 ### Discussion
 
