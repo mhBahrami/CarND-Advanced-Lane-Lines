@@ -59,7 +59,7 @@ The goals / steps of this project are the following:
 [image15]: ./res/test2_calculated_curved_pipelines.jpg "The Calculated Pipelines"
 [image16]: ./res/test2_curved_pipelines_with_green_zone.jpg "The Calculated Pipelines with Green Zone"
 [image17]: ./res/test2_img_trans_rec2org.jpg "Retransform to the Original Perspective"
-[image18]: ./res/test2_final.jpg "Final Result"
+[image18]: ./res/test2_final1.jpg "Final Result"
 [image19]: ./res/off_1.png "Issue with Tuning Parameters by Hand!"
 [image20]: ./res/tuning_tool.png "Tuning Tool"
 [image21]: ./res/tuned_frame.png "Resolving Issue after Using the Tuning Tool"
